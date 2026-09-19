@@ -56,7 +56,7 @@ jobs:
       - name: Terraform Format Check
         working-directory: s3
         run: |
-          terraform fmt -check -diff
+          terraform fmt -check 
 
 
   # ==================================================
