@@ -69,7 +69,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "dtag_s3_bucket_en
 # ---------------------------------------------------------
 # Block Public Access
 # ---------------------------------------------------------
-
 resource "aws_s3_bucket_public_access_block" "terraform_state" {
   bucket = aws_s3_bucket.dtag_s3_bucket.id
 
