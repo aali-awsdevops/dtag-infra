@@ -1,5 +1,4 @@
 # KMS Key for s3 bucket store data
-
 resource "aws_kms_key" "dtag_s3_kms_key" {
   description             = "KMS key for S3 bucket"
   deletion_window_in_days = 7
