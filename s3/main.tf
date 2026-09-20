@@ -9,9 +9,7 @@ resource "aws_kms_key" "dtag_s3_kms_key" {
     ManagedBy = "dtag-infra"
   }
 }
-
 #KMS Alias for s3 bucket store data
-
 resource "aws_kms_alias" "dtag_s3_kms_alias" {
   name          = "alias/dtag-s3-kms-key"
   target_key_id = aws_kms_key.dtag_s3_kms_key.key_id
