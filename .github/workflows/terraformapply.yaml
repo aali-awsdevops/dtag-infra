@@ -1,6 +1,4 @@
-```yaml
 name: dtag-infra-infrastructure
-
 on:
   workflow_dispatch:
     inputs:
@@ -13,25 +11,19 @@ on:
           - s3
           - ec2
           - elb
-
 permissions:
   id-token: write
   contents: read
-
 env:
   TF_VERSION: "1.15.0"
 
 jobs:
-
   # ==========================================================
   # 1. Terraform Plan
   # ==========================================================
   terraform-plan:
-
     name: Terraform Plan
-
     runs-on: ubuntu-latest
-
     outputs:
       folder: ${{ steps.config.outputs.folder }}
       action: ${{ steps.config.outputs.action }}
