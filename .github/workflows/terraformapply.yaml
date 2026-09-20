@@ -11,6 +11,14 @@ on:
           - s3
           - ec2
           - elb
+  # Action selection
+      action:
+        description: "Select Terraform action"
+        required: true
+        type: choice
+        options:
+          - apply
+          - destroy
 permissions:
   id-token: write
   contents: read
