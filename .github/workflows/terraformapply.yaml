@@ -218,4 +218,3 @@ jobs:
         working-directory: ${{ needs.terraform-plan.outputs.folder }}
         run: |
           terraform apply -auto-approve tfplan
-```
