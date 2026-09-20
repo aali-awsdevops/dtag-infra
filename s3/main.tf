@@ -1,5 +1,4 @@
 # KMS Key for s3 bucket store data
-
 resource "aws_kms_key" "dtag_s3_kms_key" {
   description             = "KMS key for S3 bucket"
   deletion_window_in_days = 7
@@ -10,9 +9,7 @@ resource "aws_kms_key" "dtag_s3_kms_key" {
     ManagedBy = "dtag-infra"
   }
 }
-
 #KMS Alias for s3 bucket store data
-
 resource "aws_kms_alias" "dtag_s3_kms_alias" {
   name          = "alias/dtag-s3-kms-key"
   target_key_id = aws_kms_key.dtag_s3_kms_key.key_id
@@ -69,10 +66,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "dtag_s3_bucket_en
 # ---------------------------------------------------------
 # Block Public Access
 # ---------------------------------------------------------
-
 resource "aws_s3_bucket_public_access_block" "terraform_state" {
   bucket = aws_s3_bucket.dtag_s3_bucket.id
-
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
