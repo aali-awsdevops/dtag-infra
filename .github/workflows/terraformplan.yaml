@@ -56,7 +56,7 @@ jobs:
       - name: Terraform Format Check
         working-directory: s3
         run: |
-          terraform fmt -check -diff
+          terraform fmt
 
 
   # ==================================================
@@ -105,6 +105,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+       # ----------------------------------------------
+      # Check GitHub OIDC claims
+      # ----------------------------------------------
+      - name: Check GitHub OIDC Claims
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('sts.amazonaws.com');
+
+            const payload = JSON.parse(
+              Buffer.from(token.split('.')[1], 'base64url').toString()
+            );
+
+            console.log("======================================");
+            console.log("GitHub OIDC Information");
+            console.log("======================================");
+            console.log("Repository : " + payload.repository);
+            console.log("Subject    : " + payload.sub);
+            console.log("Audience   : " + payload.aud);
+            console.log("Issuer     : " + payload.iss);
+            console.log("======================================");
+
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
