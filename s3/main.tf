@@ -47,7 +47,8 @@ resource "aws_s3_bucket_ownership_controls" "dtag_s3_bucket_ownership_controls" 
 resource "aws_s3_bucket_acl" "dtag_s3_bucket_acl" {
   bucket = aws_s3_bucket.dtag_s3_bucket.id
   acl    = "private"
-
+  depends_on = [aws_s3_bucket_ownership_controls.dtag_s3_bucket_ownership_controls]
+}
 # S3 Bucket Versioning
 resource "aws_s3_bucket_versioning" "dtag_s3_bucket_versioning" {
   bucket = aws_s3_bucket.dtag_s3_bucket.id
