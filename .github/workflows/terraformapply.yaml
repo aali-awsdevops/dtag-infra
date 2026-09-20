@@ -1,0 +1,221 @@
+```yaml
+name: dtag-infra-infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      folder:
+        description: "Select Terraform folder"
+        required: true
+        type: choice
+        options:
+          - vpc
+          - s3
+          - ec2
+          - elb
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_VERSION: "1.15.0"
+
+jobs:
+
+  # ==========================================================
+  # 1. Terraform Plan
+  # ==========================================================
+  terraform-plan:
+
+    name: Terraform Plan
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      folder: ${{ steps.config.outputs.folder }}
+      action: ${{ steps.config.outputs.action }}
+
+    steps:
+
+      # --------------------------------------------------------
+      # Checkout
+      # --------------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v6
+
+
+      # --------------------------------------------------------
+      # Read workflow inputs
+      # --------------------------------------------------------
+      - name: Configure
+        id: config
+        run: |
+          echo "folder=${{ inputs.folder }}" >> "$GITHUB_OUTPUT"
+          echo "action=${{ inputs.action }}" >> "$GITHUB_OUTPUT"
+
+
+      # --------------------------------------------------------
+      # AWS OIDC
+      # --------------------------------------------------------
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::472387458319:role/dtag-githbactions-plan
+          aws-region: us-east-1
+
+
+      # --------------------------------------------------------
+      # Terraform
+      # --------------------------------------------------------
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+
+      # --------------------------------------------------------
+      # Terraform Init
+      # --------------------------------------------------------
+      - name: Terraform Init
+        working-directory: ${{ inputs.folder }}
+        run: |
+          terraform init
+
+
+      # --------------------------------------------------------
+      # Terraform Plan
+      # --------------------------------------------------------
+      - name: Terraform Plan
+        working-directory: ${{ inputs.folder }}
+        run: |
+
+          if [ "${{ inputs.action }}" = "destroy" ]; then
+
+            echo "Running Terraform Destroy Plan"
+
+            terraform plan -destroy \
+              -out=tfplan
+
+          else
+
+            echo "Running Terraform Apply Plan"
+
+            terraform plan \
+              -out=tfplan
+
+          fi
+
+
+      # --------------------------------------------------------
+      # Upload Plan
+      # --------------------------------------------------------
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-${{ inputs.folder }}
+          path: ${{ inputs.folder }}/tfplan
+
+
+  # ==========================================================
+  # 2. Manual Approval
+  # ==========================================================
+  terraform-approval:
+
+    name: Manual Approval
+
+    needs:
+      - terraform-plan
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: terraform-production
+
+    steps:
+
+      - name: Approval
+        run: |
+          echo "Terraform plan completed."
+          echo "Waiting for manual approval."
+
+
+  # ==========================================================
+  # 3. Terraform Apply / Destroy
+  # ==========================================================
+  terraform-action:
+
+    name: Terraform ${{ needs.terraform-plan.outputs.action }}
+
+    needs:
+      - terraform-plan
+      - terraform-approval
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # --------------------------------------------------------
+      # Checkout
+      # --------------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v6
+
+
+      # --------------------------------------------------------
+      # AWS OIDC
+      # --------------------------------------------------------
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::472387458319:role/dtag-githbactions-plan
+          aws-region: us-east-1
+
+
+      # --------------------------------------------------------
+      # Terraform
+      # --------------------------------------------------------
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+
+      # --------------------------------------------------------
+      # Terraform Init
+      # --------------------------------------------------------
+      - name: Terraform Init
+        working-directory: ${{ needs.terraform-plan.outputs.folder }}
+        run: |
+          terraform init
+
+
+      # --------------------------------------------------------
+      # Download Plan
+      # --------------------------------------------------------
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan-${{ needs.terraform-plan.outputs.folder }}
+          path: ${{ needs.terraform-plan.outputs.folder }}
+
+
+      # --------------------------------------------------------
+      # Terraform Apply
+      # --------------------------------------------------------
+      - name: Terraform Apply
+        if: needs.terraform-plan.outputs.action == 'apply'
+        working-directory: ${{ needs.terraform-plan.outputs.folder }}
+        run: |
+          terraform apply -auto-approve tfplan
+
+
+      # --------------------------------------------------------
+      # Terraform Destroy
+      # --------------------------------------------------------
+      - name: Terraform Destroy
+        if: needs.terraform-plan.outputs.action == 'destroy'
+        working-directory: ${{ needs.terraform-plan.outputs.folder }}
+        run: |
+          terraform apply -auto-approve tfplan
+```
