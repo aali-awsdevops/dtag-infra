@@ -25,12 +25,14 @@ resource "aws_s3_bucket" "dtag_s3_bucket" {
   }
 }
 
-#Bucket Access Control List (ACL)
+#Bucket Access Control List (ACL).
 
 resource "aws_s3_bucket_acl" "dtag_s3_bucket_acl" {
   bucket = aws_s3_bucket.dtag_s3_bucket.id
   acl    = "private"
+  depends_on = [aws_s3_bucket_ownership_controls.dtag_s3_bucket_ownership_controls]
 }
+
 
 # S3 Buket Ownership controls
 resource "aws_s3_bucket_ownership_controls" "dtag_s3_bucket_ownership_controls" {
@@ -39,6 +41,12 @@ resource "aws_s3_bucket_ownership_controls" "dtag_s3_bucket_ownership_controls" 
     object_ownership = "BucketOwnerPreferred"
   }
 }
+
+#Bucket Access Control List (ACL).
+
+resource "aws_s3_bucket_acl" "dtag_s3_bucket_acl" {
+  bucket = aws_s3_bucket.dtag_s3_bucket.id
+  acl    = "private"
 
 # S3 Bucket Versioning
 resource "aws_s3_bucket_versioning" "dtag_s3_bucket_versioning" {
