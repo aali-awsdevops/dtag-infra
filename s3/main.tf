@@ -4,7 +4,7 @@ resource "aws_kms_key" "dtag_s3_kms_key" {
   deletion_window_in_days = 7
   enable_key_rotation     = true
   tags = {
-    Name      = "dtag-s3-kms-key"
+    Name      = "dtag-kms-key"
     Purpose   = "S3 bucket encryption"
     ManagedBy = "dtag-infra"
   }
