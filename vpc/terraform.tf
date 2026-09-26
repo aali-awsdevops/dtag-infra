@@ -12,7 +12,7 @@ terraform {
     bucket       = "dtag-infra"
     key          = "dev/terraform.tfstate"
     region       = "us-east-1"
-    #profile      = "dtag-dev"
+    #profile      = "dtag-s3-bucket"
     use_lockfile = true
   }
 }
