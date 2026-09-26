@@ -32,7 +32,7 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Init
-        working-directory: s3
+        working-directory: vpc
         run: |
           terraform init -backend=false
 
@@ -54,7 +54,7 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Format Check
-        working-directory: s3
+        working-directory: vpc
         run: |
           terraform fmt
 
@@ -82,12 +82,12 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Init
-        working-directory: s3
+        working-directory: vpc
         run: |
           terraform init -backend=false
 
       - name: Terraform Validate
-        working-directory: s3
+        working-directory: vpc
         run: |
           terraform validate
 
@@ -140,7 +140,7 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Init
-        working-directory: s3
+        working-directory: vpc
         run: |
           terraform init
 
