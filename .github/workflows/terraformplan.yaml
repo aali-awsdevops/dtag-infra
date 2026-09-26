@@ -145,6 +145,6 @@ jobs:
           terraform init
 
       - name: Terraform Plan
-        working-directory: s3
+        working-directory: vpc
         run: |
           terraform plan
