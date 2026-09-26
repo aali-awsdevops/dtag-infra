@@ -105,21 +105,22 @@ locals {
       cidr_block        = var.subnet_cidr_block[0]
       availability_zone = var.availability_zones[0]
     }
-
+/*
     "private-dtag-subnet-1" = {
       cidr_block        = var.subnet_cidr_block[1]
       availability_zone = var.availability_zones[0]
     }
-
+*/
     "public-dtag-subnet-2" = {
       cidr_block        = var.subnet_cidr_block[2]
       availability_zone = var.availability_zones[1]
     }
-
+/*
     "private-subnet-2" = {
       cidr_block        = var.subnet_cidr_block[3]
       availability_zone = var.availability_zones[1]
     }
+*/
   }
 }
 
@@ -157,7 +158,7 @@ resource "aws_internet_gateway" "dtag_igw" {
 # 2 NAT Gateways = 2 EIPs
 # One NAT Gateway per AZ
 # ============================================================
-
+/*
 resource "aws_eip" "dtag_nat_eip" {
   for_each = {
     "public-dtagsubnet-1"  = "public-dtagsubnet-1"
@@ -171,14 +172,14 @@ resource "aws_eip" "dtag_nat_eip" {
   }
 }
 
-
+*/
 # ============================================================
 # NAT GATEWAYS
 #
 # NAT Gateway 1 -> Public Subnet 1 -> AZ1
 # NAT Gateway 2 -> Public Subnet 2 -> AZ2
 # ============================================================
-
+/*
 resource "aws_nat_gateway" "dtag_nat_gw" {
   for_each = {
     "public-dtagsubnet-1"  = "public-dtagsubnet-1"
@@ -198,7 +199,7 @@ resource "aws_nat_gateway" "dtag_nat_gw" {
   ]
 }
 
-
+*/
 # ============================================================
 # PUBLIC ROUTE TABLES
 #
@@ -231,7 +232,7 @@ resource "aws_route_table" "dtag_public_route_tables" {
 # Private Subnet 1 -> NAT Gateway 1
 # Private Subnet 2 -> NAT Gateway 2
 # ============================================================
-
+/*
 resource "aws_route_table" "dtag_private_route_tables" {
   for_each = {
     "private-dtag-subnet-1" = "public-dtagsubnet-1"
@@ -249,7 +250,7 @@ resource "aws_route_table" "dtag_private_route_tables" {
     Name = "${each.key}-rt"
   }
 }
-
+*/
 
 # ============================================================
 # PUBLIC ROUTE TABLE ASSOCIATIONS
@@ -270,7 +271,7 @@ resource "aws_route_table_association" "dtag_public_route_table_associations" {
 # ============================================================
 # PRIVATE ROUTE TABLE ASSOCIATIONS
 # ============================================================
-
+/*
 resource "aws_route_table_association" "dtag_private_route_table_associations" {
   for_each = {
     "private-dtag-subnet-1" = "private-dtag-subnet-1"
@@ -281,3 +282,4 @@ resource "aws_route_table_association" "dtag_private_route_table_associations" {
 
   route_table_id = aws_route_table.dtag_private_route_tables[each.key].id
 }
+*/
